@@ -276,3 +276,50 @@ type StockExchange struct {
 	Name   string `json:"name"`
 	Tape   string `json:"tape"`
 }
+
+type TickerSnapshot struct {
+	Day struct {
+		Close                 float64 `json:"c"`
+		High                  float64 `json:"h"`
+		Low                   float64 `json:"l"`
+		Open                  float64 `json:"o"`
+		Volume                int     `json:"v"`
+		VolumeWeightedAverage float64 `json:"vw"`
+	} `json:"day"`
+	LastQuote struct {
+		BidPrice  float64 `json:"P"`
+		BidSize   int     `json:"S"`
+		AskPrice  float64 `json:"p"`
+		AskSize   int     `json:"s"`
+		Timestamp int64   `json:"t"`
+	} `json:"lastQuote"`
+	LastTrade struct {
+		Conditions []int   `json:"c"`
+		ID         string  `json:"i"`
+		Price      float64 `json:"p"`
+		Size       int     `json:"s"`
+		Timestamp  int64   `json:"t"`
+		ExchangeID int     `json:"x"`
+	} `json:"lastTrade"`
+	Min struct {
+		AccumulatedVolume     int     `json:"av"`
+		Close                 float64 `json:"c"`
+		High                  float64 `json:"h"`
+		Low                   float64 `json:"l"`
+		Open                  float64 `json:"o"`
+		Volume                int     `json:"v"`
+		VolumeWeightedAverage float64 `json:"vw"`
+	} `json:"min"`
+	PrevDay struct {
+		Close                 float64 `json:"c"`
+		High                  float64 `json:"h"`
+		Low                   float64 `json:"l"`
+		Open                  float64 `json:"o"`
+		Volume                int     `json:"v"`
+		VolumeWeightedAverage float64 `json:"vw"`
+	} `json:"prevDay"`
+	Ticker           string  `json:"ticker"`
+	TodaysChange     float64 `json:"todaysChange"`
+	TodaysChangePerc float64 `json:"todaysChangePerc"`
+	Updated          int64   `json:"updated"`
+}

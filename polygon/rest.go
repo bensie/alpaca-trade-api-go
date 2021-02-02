@@ -16,13 +16,14 @@ import (
 )
 
 const (
-	aggURL      = "%v/v1/historic/agg/%v/%v"
-	aggv2URL    = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
-	tradesURL   = "%v/v1/historic/trades/%v/%v"
-	tradesv2URL = "%v/v2/ticks/stocks/trades/%v/%v"
-	quotesURL   = "%v/v1/historic/quotes/%v/%v"
-	quotesv2URL = "%v/v2/ticks/stocks/nbbo/%v/%v"
-	exchangeURL = "%v/v1/meta/exchanges"
+	aggURL             = "%v/v1/historic/agg/%v/%v"
+	aggv2URL           = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
+	tradesURL          = "%v/v1/historic/trades/%v/%v"
+	tradesv2URL        = "%v/v2/ticks/stocks/trades/%v/%v"
+	quotesURL          = "%v/v1/historic/quotes/%v/%v"
+	quotesv2URL        = "%v/v2/ticks/stocks/nbbo/%v/%v"
+	exchangeURL        = "%v/v1/meta/exchanges"
+	snapshotGainersURL = "%v/v2/snapshot/locale/us/markets/stocks/gainers"
 )
 
 var (
@@ -361,6 +362,36 @@ func (c *Client) GetStockExchanges() ([]StockExchange, error) {
 
 }
 
+// GetSnapshotGainers requests the current top 20 gainers of the day in stocks/equities markets
+func (c *Client) GetSnapshotGainers() ([]TickerSnapshot, error) {
+	u, err := url.Parse(fmt.Sprintf(snapshotGainersURL, base))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	q.Set("apiKey", c.credentials.PolygonKeyID)
+
+	u.RawQuery = q.Encode()
+
+	resp, err := get(u)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode >= http.StatusMultipleChoices {
+		return nil, fmt.Errorf("status code %v", resp.StatusCode)
+	}
+
+	var ticketSnapshots []TickerSnapshot
+	if err = unmarshal(resp, &ticketSnapshots); err != nil {
+		return nil, err
+	}
+
+	return ticketSnapshots, nil
+
+}
+
 // GetHistoricAggregates requests polygon's REST API for historic aggregates
 // for the provided resolution based on the provided query parameters using
 // the default Polygon client.
@@ -391,6 +422,10 @@ func GetHistoricQuotes(symbol, date string) (totalQuotes *HistoricQuotes, err er
 // stock and equities exchanges
 func GetStockExchanges() ([]StockExchange, error) {
 	return DefaultClient.GetStockExchanges()
+}
+
+func GetSnapshotGainers() ([]TickerSnapshot, error) {
+	return DefaultClient.GetSnapshotGainers()
 }
 
 func unmarshal(resp *http.Response, data interface{}) error {
